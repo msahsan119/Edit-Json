@@ -3,14 +3,13 @@ name: Build JSON Editor Executables
 on:
   push:
     branches: [ main ]
-  workflow_dispatch: # Allows manual triggering
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        # We run the build on all three operating systems
         os: [windows-latest, macos-latest, ubuntu-latest]
         include:
           - os: windows-latest
@@ -25,10 +24,10 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4  # Updated to v4
 
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5  # Updated to v5
       with:
         python-version: '3.10'
 
@@ -39,17 +38,14 @@ jobs:
 
     - name: Install Linux Dependencies (Ubuntu only)
       if: matrix.os == 'ubuntu-latest'
-      run: sudo apt-get install -y python3-tk
+      run: sudo apt-get update && sudo apt-get install -y python3-tk
 
     - name: Build with PyInstaller
       run: |
-        # --onefile: single executable
-        # --noconsole: hides the black terminal window (GUI only)
-        # --name: names the output file
         pyinstaller --noconsole --onefile --name ${{ matrix.artifact_name }} json_edit.py
 
     - name: Upload Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4  # Updated to v4
       with:
         name: ${{ matrix.asset_name }}
         path: dist/${{ matrix.artifact_name }}*
