@@ -9,7 +9,7 @@ jobs:
   build:
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: false # Prevents one failure from cancelling other builds
+      fail-fast: false
       matrix:
         os: [windows-latest, macos-latest, ubuntu-latest]
         include:
@@ -32,10 +32,6 @@ jobs:
       with:
         python-version: '3.10'
 
-    - name: Debug - List Files
-      run: |
-        ls -R # This shows us exactly what files are in the folder
-
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
@@ -48,19 +44,24 @@ jobs:
         sudo apt-get install -y python3-tk
 
     - name: Build with PyInstaller
+      # This line is the fix: it forces Windows to use Bash instead of PowerShell
+      shell: bash
       run: |
-        # This command finds any file ending in .py that looks like 'json_edit' 
-        # regardless of case or subfolder location
-        SCRIPT_PATH=$(find . -name "[Jj]son_edit*.py" | head -n 1)
+        # Search for any file named json_edit.py (case insensitive)
+        # Looking in root and 1 level deep
+        SCRIPT_PATH=$(find . -maxdepth 2 -iname "json_edit*.py" | head -n 1)
         
         if [ -z "$SCRIPT_PATH" ]; then
           echo "ERROR: Could not find your python script!"
+          echo "Files found in repository:"
           ls -R
           exit 1
         fi
         
-        echo "Building using script found at: $SCRIPT_PATH"
-        pyinstaller --noconsole --onefile --name ${{ matrix.artifact_name }} "$SCRIPT_PATH"
+        echo "Successfully found: $SCRIPT_PATH"
+        echo "Starting PyInstaller build..."
+        
+        pyinstaller --noconsole --onefile --name "${{ matrix.artifact_name }}" "$SCRIPT_PATH"
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
