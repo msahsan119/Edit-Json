@@ -9,6 +9,7 @@ jobs:
   build:
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false # Prevents one failure from cancelling other builds
       matrix:
         os: [windows-latest, macos-latest, ubuntu-latest]
         include:
@@ -24,12 +25,16 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4  # Updated to v4
+      uses: actions/checkout@v4
 
     - name: Set up Python
-      uses: actions/setup-python@v5  # Updated to v5
+      uses: actions/setup-python@v5
       with:
         python-version: '3.10'
+
+    - name: Debug - List Files
+      run: |
+        ls -R # This shows us exactly what files are in the folder
 
     - name: Install dependencies
       run: |
@@ -38,14 +43,17 @@ jobs:
 
     - name: Install Linux Dependencies (Ubuntu only)
       if: matrix.os == 'ubuntu-latest'
-      run: sudo apt-get update && sudo apt-get install -y python3-tk
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y python3-tk
 
     - name: Build with PyInstaller
       run: |
+        # Using json_edit.py - Ensure your file is named exactly this!
         pyinstaller --noconsole --onefile --name ${{ matrix.artifact_name }} json_edit.py
 
     - name: Upload Artifact
-      uses: actions/upload-artifact@v4  # Updated to v4
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ matrix.asset_name }}
         path: dist/${{ matrix.artifact_name }}*
