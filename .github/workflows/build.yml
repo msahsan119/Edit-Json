@@ -13,14 +13,14 @@ jobs:
       matrix:
         include:
           - os: windows-latest
-            artifact_name: Edit-json-windows.exe
-            asset_name: Edit-json-windows
+            artifact_name: json edit-windows.exe
+            asset_name: json edit-windows
           - os: ubuntu-latest
-            artifact_name: Edit-json-linux
-            asset_name: Edit-json-linux
+            artifact_name: json edit-linux
+            asset_name: json edit-linux
           - os: macos-latest
-            artifact_name: Edit-json-macos
-            asset_name: Edit-json-macos
+            artifact_name: json edit-macos
+            asset_name: json edit-macos
 
     steps:
     - name: Checkout code
@@ -42,7 +42,7 @@ jobs:
         # --onefile: Create a single executable
         # --windowed: Prevent a console/terminal from opening (GUI mode)
         # --name: Define the output filename
-        pyinstaller --onefile --windowed --name "${{ matrix.asset_name }}" Edit-json.py
+        pyinstaller --onefile --windowed --name "${{ matrix.asset_name }}" json edit.py
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
