@@ -49,8 +49,18 @@ jobs:
 
     - name: Build with PyInstaller
       run: |
-        # Using json_edit.py - Ensure your file is named exactly this!
-        pyinstaller --noconsole --onefile --name ${{ matrix.artifact_name }} json_edit.py
+        # This command finds any file ending in .py that looks like 'json_edit' 
+        # regardless of case or subfolder location
+        SCRIPT_PATH=$(find . -name "[Jj]son_edit*.py" | head -n 1)
+        
+        if [ -z "$SCRIPT_PATH" ]; then
+          echo "ERROR: Could not find your python script!"
+          ls -R
+          exit 1
+        fi
+        
+        echo "Building using script found at: $SCRIPT_PATH"
+        pyinstaller --noconsole --onefile --name ${{ matrix.artifact_name }} "$SCRIPT_PATH"
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
