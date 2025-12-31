@@ -1,11 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Dec 31 23:01:24 2025
-
-@author: msahsan
-"""
-
 import tkinter as tk
 from tkinter import filedialog, messagebox
 import json
